@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>QR Platby</title>
+
+  <meta name="theme-color" content="#000000">
+
+  <link rel="manifest" href="manifest.json">
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background:#f4f4f4;
+    }
+
+    .box {
+      max-width:400px;
+      margin:auto;
+      background:white;
+      padding:20px;
+      border-radius:12px;
+    }
+
+    input, button {
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      box-sizing:border-box;
+    }
+
+    button {
+      background:black;
+      color:white;
+      border:0;
+      border-radius:8px;
+    }
+
+    #qr {
+      margin-top:20px;
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+<div class="box">
+  <h2>QR platba</h2>
+
+  <input id="amount" placeholder="Suma (napr. 12.50)">
+  <input id="purpose" placeholder="Účel">
+
+  <button onclick="gen()">Vygenerovať QR</button>
+
+  <div id="qr"></div>
+</div>
+
+<script>
+const IBAN = "SK9311000000002947298240";
+
+function gen() {
+  const amount = document.getElementById("amount").value;
+  const purpose = document.getElementById("purpose").value || "Platba";
+
+  if (!amount) return alert("Zadaj sumu");
+
+  const data =
+`BCD
+002
+1
+SCT
+
+TATRA BANKA
+${IBAN}
+EUR${amount}
+
+${purpose}`;
+
+  document.getElementById("qr").innerHTML = "";
+
+  QRCode.toCanvas(data, { width: 280 }, function (err, canvas) {
+    document.getElementById("qr").appendChild(canvas);
+  });
+}
+
+// registrácia service workeru
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
